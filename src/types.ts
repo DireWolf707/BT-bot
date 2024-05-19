@@ -51,29 +51,15 @@ type TCreateGeneralOrder = {
   priceProtect?: boolean
 }
 
-type TCreateMarketOrder = TCreateGeneralOrder & {
-  type: TOrderType["MARKET"]
-  quantity: string
-}
-
-type TCreateLimitOrder = TCreateGeneralOrder & {
-  type: TOrderType["LIMIT"]
+type TCreateStopLimitOrder = TCreateGeneralOrder & {
+  type: TOrderType["STOP"] | TOrderType["TAKE_PROFIT"]
   quantity: string
   price: string
+  stopPrice: string
   timeInForce: TTimeInForce
 }
 
-type TCreateStopMarketOrder = TCreateGeneralOrder & {
-  type: TOrderType["STOP_MARKET"] | TOrderType["TAKE_PROFIT_MARKET"]
-  quantity?: string
-  stopPrice: string
-  closePosition?: "true" | "false"
-}
-
-export type TCreateOrder =
-  | TCreateMarketOrder
-  | TCreateLimitOrder
-  | TCreateStopMarketOrder
+export type TCreateOrder = TCreateStopLimitOrder
 
 type TOrderEvent = {
   e: "ORDER_TRADE_UPDATE" // Event Type
@@ -81,7 +67,7 @@ type TOrderEvent = {
   T: number // Transaction Time
   o: {
     s: string // Symbol
-    c: string // Client Order Id
+    c: TOrderId // Client Order Id
     S: TSide // Side
     o: keyof TOrderType // Order Type
     f: TTimeInForce // Time in Force
@@ -142,6 +128,7 @@ export type TSocketRes = {
 export type THedgeOrder = {
   symbol: string
   usdtQty: number
+  stopPrice: number
   leverage: number
   assetPrecision: number
 }
@@ -150,6 +137,5 @@ export type THedgeTrade = THedgeOrder & {
   quantity: string
   shortPullback: number
   longPullback: number
-  stopPricePrecision: number
-  price: number
+  pricePrecision: number
 }
